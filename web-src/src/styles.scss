@@ -2,15 +2,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-dark-bg: #0f172a;
-  --color-glass: rgba(255, 255, 255, 0.03);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-primary: #1d4ed8; /* Corporate Blue (TS blue) */
+  --color-primary-hover: #1e40af;
+  --color-page-bg: #f8fafc;
+  --color-text-main: #0f172a;
+  --color-text-muted: #64748b;
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #0b0f19; /* Dark premium background color */
-  color: #f1f5f9;
+  background-color: #f8fafc; /* Crisp, premium light-mode corporate background */
+  color: #0f172a;
   overflow-x: hidden;
+  font-size: 13px; /* Symmetrical, compact corporate sizes */
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

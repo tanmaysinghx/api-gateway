@@ -4,26 +4,24 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { GlassCardComponent } from '../../shared/components/glass-card/glass-card';
 import { PulseNodeComponent } from '../../shared/components/pulse-node/pulse-node';
+import { SnackbarService } from '../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-services',
   standalone: true,
   imports: [CommonModule, FormsModule, GlassCardComponent, PulseNodeComponent],
   template: `
-    <div class="space-y-6 relative">
-      <!-- Ambient purple light -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
+    <div class="space-y-5">
       <!-- Header Section -->
       <div>
-        <h1 class="text-xl font-black text-slate-100 flex items-center gap-2">
+        <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
           🌐 Ingress Cluster Routing & Registry
         </h1>
-        <p class="text-xs text-slate-400 mt-1">Register, monitor, and configure active target microservices on the gateway</p>
+        <p class="text-xs text-slate-500">Register, monitor, and configure active target microservices on the gateway</p>
       </div>
 
       <!-- Content Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
         <!-- Services Registry List (Takes 2 columns) -->
         <div class="lg:col-span-2">
@@ -31,47 +29,47 @@ import { PulseNodeComponent } from '../../shared/components/pulse-node/pulse-nod
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr class="border-b border-white/5 text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                    <th class="pb-3">Cluster Info</th>
-                    <th class="pb-3">Route Prefix</th>
-                    <th class="pb-3">Protocol / Tech</th>
-                    <th class="pb-3">Active Instances Status</th>
-                    <th class="pb-3 text-right">Actions</th>
+                  <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                    <th class="pb-2.5">Cluster Info</th>
+                    <th class="pb-2.5">Route Prefix</th>
+                    <th class="pb-2.5">Protocol / Tech</th>
+                    <th class="pb-2.5">Active Instances Status</th>
+                    <th class="pb-2.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-white/5 text-sm">
+                <tbody class="divide-y divide-slate-100 text-xs">
                   @for (svc of services(); track svc.id) {
                     <tr>
-                      <td class="py-3.5 pr-2">
-                        <div class="font-bold text-slate-100">{{ svc.name }}</div>
-                        <div class="text-[10px] text-slate-500 font-mono">{{ svc.id }}</div>
+                      <td class="py-3 pr-2">
+                        <div class="font-bold text-slate-800">{{ svc.name }}</div>
+                        <div class="text-[9px] text-slate-400 font-mono">{{ svc.id }}</div>
                       </td>
-                      <td class="py-3.5 font-mono text-cyan-400 text-xs">{{ svc.prefix }}</td>
-                      <td class="py-3.5">
-                        <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md bg-white/5 border border-white/5 mr-1 text-purple-400">
+                      <td class="py-3 font-mono text-primary font-semibold text-[11px]">{{ svc.prefix }}</td>
+                      <td class="py-3">
+                        <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md bg-slate-50 border border-slate-200 mr-1 text-slate-600">
                           {{ svc.protocol }}
                         </span>
-                        <span class="text-[10px] text-slate-400 font-medium">{{ svc.tech_stack }}</span>
+                        <span class="text-[10px] text-slate-500 font-medium">{{ svc.tech_stack }}</span>
                       </td>
-                      <td class="py-3.5">
-                        <div class="flex flex-col gap-1">
+                      <td class="py-3">
+                        <div class="flex flex-col gap-1.5">
                           @for (inst of svc.instances; track inst.id) {
                             <app-pulse-node [healthy]="inst.healthy" [label]="inst.url"></app-pulse-node>
                           } @empty {
-                            <span class="text-xs text-slate-500 italic">No node instances added</span>
+                            <span class="text-[10px] text-slate-400 italic">No node instances added</span>
                           }
                         </div>
                       </td>
-                      <td class="py-3.5 text-right">
+                      <td class="py-3 text-right">
                         <button (click)="deleteService(svc.id)"
-                          class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold px-3 py-1 rounded-lg border border-rose-500/10 hover:border-rose-500/30 transition-all duration-300">
+                          class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-[10px] font-bold px-2.5 py-1 rounded-md border border-rose-100 hover:border-rose-600 transition-all duration-200 cursor-pointer">
                           De-register
                         </button>
                       </td>
                     </tr>
                   } @empty {
                     <tr>
-                      <td colspan="5" class="py-12 text-center text-slate-500 italic">
+                      <td colspan="5" class="py-16 text-center text-slate-400 italic">
                         No active microservices registered in Gateway Catalog.
                       </td>
                     </tr>
@@ -85,84 +83,84 @@ import { PulseNodeComponent } from '../../shared/components/pulse-node/pulse-nod
         <!-- Register Form Sidebar (Takes 1 column) -->
         <div>
           <app-glass-card title="Register New Cluster" icon="➕">
-            <form (ngSubmit)="registerService()" class="space-y-4 text-xs">
+            <form (ngSubmit)="registerService()" class="space-y-3.5 text-xs">
               <div>
-                <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Service Identifier (ID)</label>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Service Identifier (ID)</label>
                 <input type="text" name="id" [(ngModel)]="form.id" required
-                  class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                  class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                   placeholder="users-cluster">
               </div>
 
               <div>
-                <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Human-Friendly Name</label>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Human-Friendly Name</label>
                 <input type="text" name="name" [(ngModel)]="form.name" required
-                  class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                  class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                   placeholder="User Profile Management">
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Protocol</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Protocol</label>
                   <select name="protocol" [(ngModel)]="form.protocol"
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300">
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200">
                     <option value="REST">REST</option>
                     <option value="SOAP">SOAP</option>
                     <option value="gRPC">gRPC</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Route Prefix</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Route Prefix</label>
                   <input type="text" name="prefix" [(ngModel)]="form.prefix" required
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                     placeholder="/api">
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Tech Stack</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tech Stack</label>
                   <input type="text" name="techStack" [(ngModel)]="form.techStack"
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                     placeholder="Go">
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Health Path</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Health Path</label>
                   <input type="text" name="healthCheckPath" [(ngModel)]="form.healthCheckPath"
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                     placeholder="/health">
                 </div>
               </div>
 
               <div>
-                <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Service Instances (CSV)</label>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Service Instances (CSV)</label>
                 <input type="text" name="instances" [(ngModel)]="form.instances" required
-                  class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                  class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                   placeholder="http://localhost:8081,http://localhost:8082">
               </div>
 
-              <div class="flex items-center gap-2 py-1">
+              <div class="flex items-center gap-2 py-0.5">
                 <input type="checkbox" name="requiresAuth" [(ngModel)]="form.requiresAuth" id="requiresAuth"
-                  class="accent-cyan-500 h-4 w-4 bg-slate-950 border border-white/10 rounded">
-                <label for="requiresAuth" class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider select-none">Enforce Cryptographic JWT Auth</label>
+                  class="accent-primary h-3.5 w-3.5 border-slate-300 rounded cursor-pointer">
+                <label for="requiresAuth" class="text-[9px] font-bold text-slate-500 uppercase tracking-wider select-none cursor-pointer">Enforce Cryptographic Auth</label>
               </div>
 
-              <div class="grid grid-cols-2 gap-3 border-t border-white/5 pt-3">
+              <div class="grid grid-cols-2 gap-3 border-t border-slate-100 pt-3">
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Rate Limit (req/s)</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Rate Limit (req/s)</label>
                   <input type="number" name="rateLimitLimit" [(ngModel)]="form.rateLimitLimit"
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                     placeholder="10.0">
                 </div>
                 <div>
-                  <label class="block text-[10px] font-semibold text-slate-300 uppercase tracking-wider mb-1">Burst Margin</label>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Burst Margin</label>
                   <input type="number" name="rateLimitBurst" [(ngModel)]="form.rateLimitBurst"
-                    class="w-full bg-slate-950/40 border border-white/10 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-500/40 transition-all duration-300"
+                    class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-200"
                     placeholder="15">
                 </div>
               </div>
 
               <button type="submit"
-                class="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-slate-100 font-bold py-2.5 px-4 rounded-lg shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-all duration-300">
+                class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 text-xs cursor-pointer">
                 Deploy Cluster Configuration
               </button>
             </form>
@@ -175,6 +173,7 @@ import { PulseNodeComponent } from '../../shared/components/pulse-node/pulse-nod
 })
 export class ServicesComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
+  private snackbar = inject(SnackbarService);
 
   services = signal<any[]>([]);
   private pollInterval: any;
@@ -212,7 +211,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
 
   registerService() {
     if (!this.form.id || !this.form.name || !this.form.prefix || !this.form.instances) {
-      alert('ID, Name, Prefix, and instances CSV are required!');
+      this.snackbar.show('ID, Name, Prefix, and instances are required!', 'error');
       return;
     }
 
@@ -233,6 +232,7 @@ export class ServicesComponent implements OnInit, OnDestroy {
     this.api.registerService(payload).subscribe({
       next: () => {
         this.fetchServices();
+        this.snackbar.show(`Cluster '${payload.id}' deployed successfully!`, 'success');
         this.form = {
           id: '',
           name: '',
@@ -246,15 +246,24 @@ export class ServicesComponent implements OnInit, OnDestroy {
           rateLimitBurst: 15
         };
       },
-      error: (err) => alert('Registration failed: ' + (err.error || err.message))
+      error: (err) => {
+        this.snackbar.show('Failed to register cluster!', 'error');
+        console.error(err);
+      }
     });
   }
 
   deleteService(id: string) {
     if (confirm(`De-register cluster ${id} from Gateway catalog?`)) {
       this.api.deregisterService(id).subscribe({
-        next: () => this.fetchServices(),
-        error: (err) => alert('De-registration failed: ' + (err.error || err.message))
+        next: () => {
+          this.fetchServices();
+          this.snackbar.show(`Cluster '${id}' removed from catalog!`, 'info');
+        },
+        error: (err) => {
+          this.snackbar.show('Failed to de-register cluster!', 'error');
+          console.error(err);
+        }
       });
     }
   }

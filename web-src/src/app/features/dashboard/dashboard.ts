@@ -3,57 +3,55 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 import { GlassCardComponent } from '../../shared/components/glass-card/glass-card';
 import { LogsComponent } from '../logs/logs';
+import { SnackbarService } from '../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, GlassCardComponent, LogsComponent],
   template: `
-    <div class="space-y-6 relative">
-      <!-- Ambient light bubble -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
+    <div class="space-y-5">
       <!-- Header Section -->
       <div>
-        <h1 class="text-xl font-black text-slate-100 flex items-center gap-2">
+        <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
           📊 Performance Metrics & Telemetry
         </h1>
-        <p class="text-xs text-slate-400 mt-1">Real-time health statistics and system ingress logs</p>
+        <p class="text-xs text-slate-500">Real-time health statistics and system ingress logs</p>
       </div>
 
       <!-- Telemetry Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <app-glass-card title="Active Sockets" icon="🔌" extraClass="border-cyan-500/10">
-          <div class="text-3xl font-black text-cyan-400 mt-1">
+        <app-glass-card title="Active Sockets" icon="🔌" extraClass="border-slate-100">
+          <div class="text-xl font-bold text-primary">
             {{ stats().active_connections || 0 }}
           </div>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-2">Concurrent TCP Channels</p>
+          <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Concurrent TCP Channels</p>
         </app-glass-card>
 
-        <app-glass-card title="Telemetry Requests" icon="📊" extraClass="border-purple-500/10">
-          <div class="text-3xl font-black text-purple-400 mt-1">
+        <app-glass-card title="Telemetry Requests" icon="📊" extraClass="border-slate-100">
+          <div class="text-xl font-bold text-violet-600">
             {{ stats().total_requests || 0 }}
           </div>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-2">Aggregated Ingress Vol</p>
+          <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Aggregated Ingress Vol</p>
         </app-glass-card>
 
-        <app-glass-card title="System Latency" icon="⚡" extraClass="border-emerald-500/10">
-          <div class="text-3xl font-black text-emerald-400 mt-1">
+        <app-glass-card title="System Latency" icon="⚡" extraClass="border-slate-100">
+          <div class="text-xl font-bold text-emerald-600">
             {{ stats().average_latency_ms ? stats().average_latency_ms.toFixed(2) + 'ms' : '0.00ms' }}
           </div>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-2">Avg Execution Overhead</p>
+          <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Avg Execution Overhead</p>
         </app-glass-card>
 
-        <app-glass-card title="Error Telemetry" icon="🛡️" extraClass="border-rose-500/10">
-          <div class="text-3xl font-black text-rose-400 mt-1">
+        <app-glass-card title="Error Telemetry" icon="🛡️" extraClass="border-slate-100">
+          <div class="text-xl font-bold text-rose-600">
             {{ stats().error_rate_percent ? stats().error_rate_percent.toFixed(2) + '%' : '0.00%' }}
           </div>
-          <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mt-2">Ingress Error Overhead</p>
+          <p class="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-1">Ingress Error Overhead</p>
         </app-glass-card>
       </div>
 
       <!-- Log Terminal & Dev Sandbox row -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <!-- Log Terminal takes 2 cols -->
         <div class="lg:col-span-2">
           <app-logs></app-logs>
@@ -61,18 +59,25 @@ import { LogsComponent } from '../logs/logs';
 
         <!-- Dev Sandbox takes 1 col -->
         <div>
-          <app-glass-card title="Developer Token Sandbox" icon="🛠️" extraClass="border-purple-500/10">
-            <div class="text-xs space-y-3">
-              <p class="text-slate-400 leading-relaxed">Enforce JWT authentication for a microservice and generate test administrative authorization tokens here to bypass ingress checks.</p>
+          <app-glass-card title="Developer Token Sandbox" icon="🛠️" extraClass="border-slate-100">
+            <div class="text-xs space-y-3.5">
+              <p class="text-slate-500 leading-normal text-[11px]">
+                Enforce JWT authentication for a microservice and generate test administrative authorization tokens here to bypass ingress checks.
+              </p>
               
               <button (click)="generateToken()"
-                class="w-full bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-purple-500/20 font-bold py-2 rounded-lg transition-all duration-300">
+                class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-800 border border-slate-200 hover:border-slate-300 font-bold py-2 rounded-lg transition-all duration-200 text-xs cursor-pointer">
                 Generate Secure JWT Token
               </button>
 
               @if (jwtToken()) {
-                <div class="bg-slate-950/60 border border-white/5 rounded-lg p-3 relative font-mono text-[10px] break-all leading-normal text-slate-300 select-all">
-                  <div class="font-sans text-[10px] font-bold text-purple-400 mb-1 uppercase tracking-wider">Authorized JWT Token (Bearer)</div>
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 relative font-mono text-[10px] break-all leading-relaxed text-slate-600 select-all shadow-inner">
+                  <div class="flex items-center justify-between font-sans text-[9px] font-bold text-primary mb-1 uppercase tracking-wider">
+                    <span>Authorized JWT Token (Bearer)</span>
+                    <button (click)="copyToken()" class="text-slate-400 hover:text-slate-600 text-[10px] cursor-pointer font-bold border border-slate-200 rounded px-1.5 py-0.5 bg-white shadow-sm">
+                      📋 Copy
+                    </button>
+                  </div>
                   Bearer {{ jwtToken() }}
                 </div>
               }
@@ -85,6 +90,7 @@ import { LogsComponent } from '../logs/logs';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
+  private snackbar = inject(SnackbarService);
 
   stats = signal<any>({});
   jwtToken = signal<string>('');
@@ -113,9 +119,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (res && res.token) {
           this.jwtToken.set(res.token);
+          this.snackbar.show('Cryptographic JWT generated successfully!', 'success');
         }
       },
-      error: (err) => alert('Failed to sign sandbox JWT: ' + (err.error || err.message))
+      error: (err) => {
+        this.snackbar.show('Failed to generate JWT!', 'error');
+        console.error(err);
+      }
+    });
+  }
+
+  copyToken() {
+    const fullToken = 'Bearer ' + this.jwtToken();
+    navigator.clipboard.writeText(fullToken).then(() => {
+      this.snackbar.show('Bearer JWT copied to clipboard!', 'success');
+    }).catch(err => {
+      this.snackbar.show('Failed to copy token!', 'error');
     });
   }
 }

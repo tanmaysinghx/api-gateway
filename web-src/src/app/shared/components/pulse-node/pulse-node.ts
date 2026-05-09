@@ -7,16 +7,16 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="flex items-center gap-2">
-      <span class="relative flex h-3 w-3">
+      <span class="relative flex h-2 w-2">
         @if (healthy) {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-md shadow-emerald-500/50"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         } @else {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500 shadow-md shadow-rose-500/50"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
         }
       </span>
-      <span class="text-xs font-medium" [ngClass]="healthy ? 'text-emerald-400' : 'text-rose-400'">
+      <span class="text-xs font-semibold" [ngClass]="healthy ? 'text-emerald-700' : 'text-rose-700'">
         {{ label }}
       </span>
     </div>

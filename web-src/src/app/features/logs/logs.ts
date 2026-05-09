@@ -9,25 +9,25 @@ import { GlassCardComponent } from '../../shared/components/glass-card/glass-car
   imports: [CommonModule, GlassCardComponent],
   template: `
     <app-glass-card title="System Log Streamer" icon="📟" extraClass="h-full flex flex-col">
-      <div #terminalContainer class="flex-grow overflow-y-auto bg-black/60 border border-white/5 rounded-xl p-4 font-mono text-xs text-slate-300 space-y-2 h-[450px]">
+      <div #terminalContainer class="flex-grow overflow-y-auto bg-slate-900 border border-slate-800 rounded-lg p-3.5 font-mono text-[11px] text-slate-300 space-y-1.5 h-[360px] shadow-inner">
         @for (log of logs(); track log) {
           <div class="leading-relaxed whitespace-pre-wrap">
-            <span class="text-slate-500 font-semibold">[{{ log.time }}]</span>
-            <span class="font-bold uppercase px-1 rounded-sm mx-2 text-[10px]"
+            <span class="text-slate-500 font-medium">[{{ log.time }}]</span>
+            <span class="font-semibold uppercase px-1.5 py-0.5 rounded text-[9px] mx-2 tracking-wider"
               [ngClass]="{
-                'text-cyan-400 bg-cyan-950/40 border border-cyan-500/20': log.level === 'info' || log.level === 'INFO',
-                'text-amber-400 bg-amber-950/40 border border-amber-500/20': log.level === 'warn' || log.level === 'WARN',
-                'text-rose-400 bg-rose-950/40 border border-rose-500/20': log.level === 'error' || log.level === 'ERROR'
+                'text-cyan-400 bg-cyan-950/40 border border-cyan-800/30': log.level === 'info' || log.level === 'INFO',
+                'text-amber-400 bg-amber-950/40 border border-amber-800/30': log.level === 'warn' || log.level === 'WARN',
+                'text-rose-400 bg-rose-950/40 border border-rose-800/30': log.level === 'error' || log.level === 'ERROR'
               }">
               {{ log.level }}
             </span>
-            <span class="text-slate-100">{{ log.msg }}</span>
+            <span class="text-slate-200 font-medium">{{ log.msg }}</span>
             @if (log.error) {
-              <span class="text-rose-400 font-semibold block ml-20">error: {{ log.error }}</span>
+              <span class="text-rose-400 font-medium block ml-14">error: {{ log.error }}</span>
             }
           </div>
         } @empty {
-          <div class="text-slate-500 italic text-center py-20">Waiting for system log packets to buffer...</div>
+          <div class="text-slate-500 italic text-center py-16">Waiting for system log packets to buffer...</div>
         }
       </div>
     </app-glass-card>

@@ -4,12 +4,12 @@ import { Component, Input } from '@angular/core';
   selector: 'app-glass-card',
   standalone: true,
   template: `
-    <div class="relative bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-white/20 hover:shadow-2xl hover:shadow-cyan-500/5 {{ extraClass }}">
+    <div class="relative bg-white border border-slate-200 rounded-xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_4px_12px_rgba(15,23,42,0.05)] {{ extraClass }}">
       @if (title) {
-        <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-          <h3 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+        <div class="flex items-center justify-between mb-3.5 border-b border-slate-100 pb-2.5">
+          <h3 class="text-xs font-bold text-slate-800 flex items-center gap-2">
             @if (icon) {
-              <span class="text-cyan-400 text-xl">{{ icon }}</span>
+              <span class="text-primary text-sm">{{ icon }}</span>
             }
             {{ title }}
           </h3>
