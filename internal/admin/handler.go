@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -59,6 +60,10 @@ func (ah *AdminHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case path == "/admin/api/login" && r.Method == "POST":
 		ah.handleLogin(w, r)
+	case path == "/admin/api/services/export" && r.Method == "GET":
+		ah.handleExportServices(w, r)
+	case path == "/admin/api/services/import" && r.Method == "POST":
+		ah.handleImportServices(w, r)
 	case path == "/admin/api/services" && r.Method == "GET":
 		ah.handleListServices(w, r)
 	case path == "/admin/api/services" && r.Method == "POST":
@@ -213,4 +218,30 @@ func (ah *AdminHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusUnauthorized)
 	_, _ = w.Write([]byte(`{"status":"error","message":"Invalid admin username or password"}`))
+}
+
+func (ah *AdminHandler) handleExportServices(w http.ResponseWriter, r *http.Request) {
+	services := ah.reg.GetServices()
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Disposition", "attachment; filename=ts-gateway-config.json")
+	_ = json.NewEncoder(w).Encode(services)
+}
+
+func (ah *AdminHandler) handleImportServices(w http.ResponseWriter, r *http.Request) {
+	var servicesList []*registry.Microservice
+	if err := json.NewDecoder(r.Body).Decode(&servicesList); err != nil {
+		http.Error(w, "Invalid configuration JSON: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for _, svc := range servicesList {
+		if svc.Instances == nil {
+			svc.Instances = make([]*registry.ServiceInstance, 0)
+		}
+		ah.reg.Register(svc)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(fmt.Sprintf(`{"status":"success","message":"Gateway configurations imported successfully","count":%d}`, len(servicesList))))
 }

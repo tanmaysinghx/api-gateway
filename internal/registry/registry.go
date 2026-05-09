@@ -2,11 +2,14 @@ package registry
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log/slog"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -31,24 +34,89 @@ func NewRegistry(logger *slog.Logger) *Registry {
 	}
 }
 
+// SaveToFile saves all currently registered microservices to a JSON file.
+func (r *Registry) SaveToFile(filePath string) error {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	servicesList := make([]*Microservice, 0, len(r.services))
+	for _, svc := range r.services {
+		servicesList = append(servicesList, svc)
+	}
+
+	data, err := json.MarshalIndent(servicesList, "", "  ")
+	if err != nil {
+		r.logger.Error("Failed to marshal services for persistence", "error", err)
+		return err
+	}
+
+	err = ioutil.WriteFile(filePath, data, 0644)
+	if err != nil {
+		r.logger.Error("Failed to write services persistence file", "path", filePath, "error", err)
+		return err
+	}
+
+	r.logger.Info("Persisted services configuration", "count", len(servicesList), "path", filePath)
+	return nil
+}
+
+// LoadFromFile loads microservices from a JSON file.
+func (r *Registry) LoadFromFile(filePath string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		r.logger.Info("No services persistence file found, starting fresh", "path", filePath)
+		return nil
+	}
+
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		r.logger.Error("Failed to read services persistence file", "path", filePath, "error", err)
+		return err
+	}
+
+	var servicesList []*Microservice
+	if err := json.Unmarshal(data, &servicesList); err != nil {
+		r.logger.Error("Failed to unmarshal persisted services", "error", err)
+		return err
+	}
+
+	for _, svc := range servicesList {
+		// Restore the microservice and its mutex lock structures
+		r.services[svc.ID] = svc
+		r.logger.Info("Restored persisted microservice", "id", svc.ID, "instances", len(svc.Instances))
+	}
+
+	r.logger.Info("Successfully loaded persisted services configuration", "count", len(servicesList), "path", filePath)
+	return nil
+}
+
 // Register adds or updates a microservice in the registry.
 func (r *Registry) Register(svc *Microservice) {
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	r.services[svc.ID] = svc
 	r.logger.Info("Registered microservice", "id", svc.ID, "prefix", svc.Prefix, "protocol", svc.Protocol, "tech", svc.TechStack)
+	r.mu.Unlock()
+
+	_ = r.SaveToFile("./services.json")
 }
 
 // Deregister removes a microservice from the registry.
 func (r *Registry) Deregister(id string) bool {
 	r.mu.Lock()
-	defer r.mu.Unlock()
+	success := false
 	if _, exists := r.services[id]; exists {
 		delete(r.services, id)
 		r.logger.Info("Deregistered microservice", "id", id)
-		return true
+		success = true
 	}
-	return false
+	r.mu.Unlock()
+
+	if success {
+		_ = r.SaveToFile("./services.json")
+	}
+	return success
 }
 
 // GetServices returns a list of all currently registered microservices.

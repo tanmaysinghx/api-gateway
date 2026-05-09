@@ -51,4 +51,17 @@ export class ApiService {
   generateToken(): Observable<any> {
     return this.http.post<any>(`${this.getBaseUrl()}/admin/api/token`, {}, { headers: this.getHeaders() });
   }
+
+  exportConfig(): Observable<Blob> {
+    return this.http.get(`${this.getBaseUrl()}/admin/api/services/export`, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
+  importConfig(payload: any[]): Observable<any> {
+    return this.http.post<any>(`${this.getBaseUrl()}/admin/api/services/import`, payload, {
+      headers: this.getHeaders()
+    });
+  }
 }

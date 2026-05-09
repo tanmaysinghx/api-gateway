@@ -46,9 +46,9 @@ func main() {
 
 	// 2. Initialize Service Registry & active Health Checker
 	reg := registry.NewRegistry(logger)
-
-	// Pre-register default services is disabled. The Gateway now boots with a clean, empty service registry!
-	// preRegisterDefaultServices(reg)
+	if err := reg.LoadFromFile("./services.json"); err != nil {
+		logger.Error("Failed to load persisted services", "error", err)
+	}
 
 	// Active health checks run every 5 seconds
 	ctx, cancel := context.WithCancel(context.Background())

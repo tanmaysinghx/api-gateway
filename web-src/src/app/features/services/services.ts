@@ -13,11 +13,27 @@ import { SnackbarService } from '../../core/services/snackbar.service';
   template: `
     <div class="space-y-5">
       <!-- Header Section -->
-      <div>
-        <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
-          🌐 Ingress Cluster Routing & Registry
-        </h1>
-        <p class="text-xs text-slate-500">Register, monitor, and configure active target microservices on the gateway</p>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-base font-bold text-slate-800 flex items-center gap-2">
+            🌐 Ingress Cluster Routing & Registry
+          </h1>
+          <p class="text-xs text-slate-500">Register, monitor, and configure active target microservices on the gateway</p>
+        </div>
+
+        <!-- Quick Setup Actions -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button (click)="triggerExport()"
+            class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 font-bold px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 text-[11px] shadow-sm transition-all duration-200 cursor-pointer">
+            📥 Export Config
+          </button>
+
+          <button (click)="fileInput.click()"
+            class="flex items-center gap-1.5 bg-primary hover:bg-primary-hover text-white font-bold px-3 py-1.5 rounded-lg border border-primary text-[11px] shadow-sm transition-all duration-200 cursor-pointer">
+            📤 Import Config
+          </button>
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept=".json" class="hidden">
+        </div>
       </div>
 
       <!-- Content Grid -->
@@ -266,5 +282,56 @@ export class ServicesComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  triggerExport() {
+    this.api.exportConfig().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ts-gateway-services-backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.snackbar.show('Configuration backup downloaded!', 'success');
+      },
+      error: (err) => {
+        this.snackbar.show('Failed to download configuration backup!', 'error');
+        console.error(err);
+      }
+    });
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (!Array.isArray(json)) {
+          this.snackbar.show('Invalid config! Expected a services array.', 'error');
+          return;
+        }
+
+        this.api.importConfig(json).subscribe({
+          next: () => {
+            this.fetchServices();
+            this.snackbar.show(`Imported ${json.length} cluster configurations successfully!`, 'success');
+            event.target.value = '';
+          },
+          error: (err) => {
+            this.snackbar.show('Failed to upload configurations to server!', 'error');
+            console.error(err);
+          }
+        });
+      } catch (err) {
+        this.snackbar.show('Failed to parse file! Ensure it is valid JSON.', 'error');
+      }
+    };
+    reader.readAsText(file);
   }
 }
