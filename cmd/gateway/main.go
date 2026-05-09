@@ -19,6 +19,8 @@ import (
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -98,6 +100,9 @@ func main() {
 		_, _ = w.Write(assetBytes)
 	})
 
+	// Expose Prometheus Metrics Scraper Endpoint
+	mainMux.Handle("/metrics", promhttp.Handler())
+
 	// Default Fallthrough: Data Plane Reverse Proxy
 	mainMux.Handle("/", gp)
 
@@ -111,6 +116,7 @@ func main() {
 	handler = gateway.LoggerMiddleware(logger, handler)
 	handler = gateway.CORSMiddleware(handler)
 	handler = gateway.RecoveryMiddleware(logger, handler)
+	handler = gateway.MetricsMiddleware(handler)
 
 	// 7. Establish Single-Port h2c Multiplexing
 	// Multiplexes HTTP/1.1 (REST/SOAP) and HTTP/2 (gRPC Cleartext) on port 8080

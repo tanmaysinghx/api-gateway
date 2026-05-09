@@ -475,10 +475,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Theme Toggle ---
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('ts_theme') || 'dark';
+    const savedTheme = localStorage.getItem('ts_theme') || 'light';
     
     if (savedTheme === 'light') {
         document.body.classList.add('light-theme');
+    } else {
+        document.body.classList.remove('light-theme');
     }
 
     themeToggle.addEventListener('click', () => {

@@ -142,6 +142,42 @@ docker stop ts-api-gateway && docker rm ts-api-gateway
 
 ---
 
+## 📊 Real-Time Observability (Prometheus & Loki Stack)
+
+The TS API Gateway features built-in **Prometheus metrics logging** and structured **JSON console output compatible with Grafana Loki** out-of-the-box!
+
+We have provided a complete, pre-configured **Docker Compose Monitoring Stack** that spins up the entire observability infrastructure with a single command:
+
+### 1. Spin up the Observability Pipeline
+To launch the TS API Gateway (with sandboxed mock servers active to generate telemetry), Prometheus, Loki, Promtail, and Grafana simultaneously, run:
+```bash
+docker-compose up -d
+```
+
+### 2. Services Exposed on Host
+Once booted, the following interfaces are fully accessible in your browser:
+
+| Service | Host Port | Ingress Console URL | Default Credentials |
+| :--- | :---: | :--- | :--- |
+| **TS API Gateway** | `8080` | **[http://localhost:8080/admin](http://localhost:8080/admin)** | `tanmaysinghx@gmail.com` / `Tanmay@1999` |
+| **Grafana Dashboard** | `3000` | **[http://localhost:3000](http://localhost:3000)** | `admin` / `admin` |
+| **Prometheus Exporter** | `9090` | **[http://localhost:9090/graph](http://localhost:9090)** | *None (Public Scraper)* |
+| **Loki Log Engine** | `3100` | `http://localhost:3100/loki/api/v1/status` | *Internal API* |
+
+### 3. Visualizing Metrics & Logs inside Grafana
+1. Navigate your browser to **[http://localhost:3000](http://localhost:3000)** and log in with username `admin` and password `admin`.
+2. Both **Prometheus** and **Loki** data sources are automatically provisioned and connected!
+3. Go to the **Explore** tab inside Grafana:
+   - **For Metrics:** Select the **Prometheus** datasource and run search queries like `ts_gateway_requests_total` (total metrics by status code and route) or `ts_gateway_active_connections` (live active concurrent sockets) to see gorgeous real-time graphs!
+   - **For Logs:** Select the **Loki** datasource and run query `{container="ts-api-gateway"}` to see your structured Go application logs streaming instantly in color!
+
+To tear down the observability stack:
+```bash
+docker-compose down
+```
+
+---
+
 ## 🖥️ Interactive Verification Guide
 
 By default, the gateway boots with an empty service catalog. You can provision, scale, and test backend microservices dynamically.
