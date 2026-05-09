@@ -67,32 +67,47 @@ func main() {
 	// Admin Control Plane REST Endpoints
 	mainMux.Handle("/admin/api/", ah)
 
-	// Admin Dashboard HTML Template
+	// Redirect /admin to /admin/ so relative assets load perfectly
 	mainMux.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		htmlBytes, err := web.FS.ReadFile("templates/index.html")
-		if err != nil {
-			logger.Error("Failed to read embedded index.html", "error", err)
-			http.Error(w, "Dashboard asset missing", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(htmlBytes)
+		http.Redirect(w, r, "/admin/", http.StatusMovedPermanently)
 	})
 
-	// Static Assets Server (CSS, JS)
-	mainMux.HandleFunc("/admin/static/", func(w http.ResponseWriter, r *http.Request) {
-		filePath := "static/" + strings.TrimPrefix(r.URL.Path, "/admin/static/")
-		
-		// Parse and set content-type header
+	// Admin Dashboard SPA & Static Assets Handler
+	mainMux.HandleFunc("/admin/", func(w http.ResponseWriter, r *http.Request) {
+		relPath := strings.TrimPrefix(r.URL.Path, "/admin/")
+
+		// If path is empty or does not refer to a static file (lacks a dot, e.g. SPA subroutes like /admin/dashboard)
+		// we return the main single-page index.html shell so the client-side router can take over.
+		if relPath == "" || !strings.Contains(relPath, ".") {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			htmlBytes, err := web.FS.ReadFile("templates/index.html")
+			if err != nil {
+				logger.Error("Failed to read embedded index.html", "error", err)
+				http.Error(w, "Dashboard asset missing", http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write(htmlBytes)
+			return
+		}
+
+		// Otherwise, it is a request for a static assets compiled by Angular
+		filePath := "static/" + relPath
+
+		// Match and set strict MIME types to prevent stylesheet blocked errors
 		if strings.HasSuffix(filePath, ".css") {
 			w.Header().Set("Content-Type", "text/css; charset=utf-8")
 		} else if strings.HasSuffix(filePath, ".js") {
 			w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+		} else if strings.HasSuffix(filePath, ".ico") {
+			w.Header().Set("Content-Type", "image/x-icon")
+		} else if strings.HasSuffix(filePath, ".png") {
+			w.Header().Set("Content-Type", "image/png")
 		}
 
 		assetBytes, err := web.FS.ReadFile(filePath)
 		if err != nil {
+			logger.Warn("Embedded static asset not found", "path", filePath, "error", err)
 			http.Error(w, "Static asset not found", http.StatusNotFound)
 			return
 		}
