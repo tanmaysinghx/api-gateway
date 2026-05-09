@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  ts-api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ts-api-gateway-1701
+    ports:
+      - "8080:8080"
+    command: ["-mock"] # Starts sandbox mock endpoints automatically for metrics generation
+    volumes:
+      - ./services.json:/app/services.json # Persists microservices across restarts
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus-1701
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:2.8.2
+    container_name: loki-1701
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:2.8.2
+    container_name: promtail-1701
+    volumes:
+      - /var/log:/var/log
+      - ./promtail.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: grafana-1701
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    restart: unless-stopped
