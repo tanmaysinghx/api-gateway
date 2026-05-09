@@ -1,7 +1,7 @@
 # ==========================================
 # STAGE 1: Build the Go executable binary
 # ==========================================
-FROM golang:1.22-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 # Install system dependencies needed for compiling Go modules
 RUN apk add --no-cache git gcc musl-dev
