@@ -11,11 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"api-gateway/internal/admin"
-	"api-gateway/internal/gateway"
-	"api-gateway/internal/registry"
-	"api-gateway/mocks"
-	"api-gateway/web"
+	"ts-api-gateway-1701/internal/admin"
+	"ts-api-gateway-1701/internal/gateway"
+	"ts-api-gateway-1701/internal/registry"
+	"ts-api-gateway-1701/mocks"
+	"ts-api-gateway-1701/web"
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"

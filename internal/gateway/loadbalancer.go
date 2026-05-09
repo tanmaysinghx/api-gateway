@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"api-gateway/internal/registry"
+	"ts-api-gateway-1701/internal/registry"
 )
 
 var (

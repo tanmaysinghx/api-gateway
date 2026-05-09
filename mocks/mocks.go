@@ -104,7 +104,7 @@ func StartMockSOAPServer(port int) {
 
 		// Return fully formed XML SOAP envelope
 		soapResponse := fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://example.com/api-gateway/soap">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://example.com/ts-api-gateway-1701/soap">
    <soapenv:Header/>
    <soapenv:Body>
       <web:GetUserResponse>

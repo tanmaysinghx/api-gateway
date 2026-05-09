@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"api-gateway/internal/gateway"
-	"api-gateway/internal/registry"
+	"ts-api-gateway-1701/internal/gateway"
+	"ts-api-gateway-1701/internal/registry"
 )
 
 // AdminHandler manages the management endpoints.

@@ -1,4 +1,4 @@
-module api-gateway
+module ts-api-gateway-1701
 
 go 1.26.3
 

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"api-gateway/internal/registry"
+	"ts-api-gateway-1701/internal/registry"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/time/rate"
@@ -295,7 +295,7 @@ func GenerateMockJWT(subject string, duration time.Duration) (string, error) {
 		"sub": subject,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(duration).Unix(),
-		"iss": "api-gateway",
+		"iss": "ts-api-gateway-1701",
 	})
 	return token.SignedString(JWTSecret)
 }

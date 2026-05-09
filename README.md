@@ -1,4 +1,4 @@
-# 🌌 TS API Gateway
+# 🌌 TS API Gateway 1701
 
 A production-grade, high-performance API Gateway written in **pure Go (Golang)**. 
 
@@ -26,7 +26,7 @@ This gateway leverages **Single-Port Multiplexing (h2c)** to serve standard HTTP
 The codebase adheres strictly to enterprise Go directory layouts, separating the **Data Plane** (traffic proxying) from the **Control Plane** (registry management & admin API):
 
 ```
-api-gateway/
+ts-api-gateway-1701/
 ├── cmd/
 │   └── gateway/
 │       └── main.go           # Server entrypoint (orchestrates gateway and mock nodes)
@@ -114,30 +114,30 @@ For a fully self-contained deployment with zero local Go compiler dependencies, 
 #### 1. Build the Hardened Docker Image
 Build the multi-stage, space-optimized container image:
 ```bash
-docker build -t ts-api-gateway .
+docker build -t ts-api-gateway-1701 .
 ```
 
 #### 2. Launch the Gateway Container
 Run the container in standalone production mode (mapping port `8080` to your host machine):
 ```bash
-docker run -d --name ts-api-gateway -p 8080:8080 ts-api-gateway
+docker run -d --name ts-api-gateway-1701 -p 8080:8080 ts-api-gateway-1701
 ```
 *(To run with sandbox mock backends enabled inside Docker, simply append the `-mock` flag to your run command):*
 ```bash
-docker run -d --name ts-api-gateway -p 8080:8080 ts-api-gateway -mock
+docker run -d --name ts-api-gateway-1701 -p 8080:8080 ts-api-gateway-1701 -mock
 ```
 
 #### 3. View Real-Time Logging Traces
 Verify that the server and environments are booted:
 ```bash
-docker logs -f ts-api-gateway
+docker logs -f ts-api-gateway-1701
 ```
 
 Once running, the glassmorphic console is available immediately at **[http://localhost:8080/admin](http://localhost:8080/admin)**!
 
 To stop and remove the container:
 ```bash
-docker stop ts-api-gateway && docker rm ts-api-gateway
+docker stop ts-api-gateway-1701 && docker rm ts-api-gateway-1701
 ```
 
 ---
@@ -350,4 +350,4 @@ The gateway will validate the token signature, authorize the request, and route 
 ## 🧹 Tearing Down
 
 To stop the gateway server and all mock backend processes concurrently, simply hit `Ctrl + C` in the running terminal. The server will intercept the interrupt signal, run graceful shutdowns, and terminate safely!
-# api-gateway
+# ts-api-gateway-1701
